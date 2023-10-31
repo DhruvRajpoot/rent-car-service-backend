@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema({
     role: {
         type: String,
         require: [true, "Please enter usertype"],
-        default: "user",
+        default: "normal",
     },
     email: {
         type: String,
@@ -54,7 +54,7 @@ userSchema.methods.comparePassword = function (password) {
 // Generate an auth token for the user
 userSchema.methods.generateAuthToken = async function () {
     const user = this;
-    const userobj = { _id: user._id.toString(), username: user.username, email: user.email };
+    const userobj = { _id: user._id.toString(), email: user.email };
     const accessToken = jwt.sign(userobj, process.env.JWT_SECRET, { expiresIn: "2hr" });
     const refreshToken = jwt.sign(userobj, process.env.REFRESHTOKEN_SECRET_KEY, { expiresIn: "7d" });
     return { accessToken, refreshToken };

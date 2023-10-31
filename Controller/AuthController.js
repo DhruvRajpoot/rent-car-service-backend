@@ -48,7 +48,7 @@ export const login = async (req, res) => {
     const filterUser = {
       _id: user._id.toString(),
       email: user.email,
-        fullname: user.fullname,
+      fullname: user.fullname,
     };
     res.status(200).json({
       message: "User logged in successfully",
@@ -116,25 +116,18 @@ export const sendresetcode = async (req, res) => {
     let emailSubject;
     if (purpose == "forgotpassword") {
       emailSubject = "Reset Password";
-    } else if (purpose == "updateusername") {
-      emailSubject = "Update Username";
     }
 
     // message to be sent to email
     let emailMessage;
     if (purpose == "forgotpassword") {
       emailMessage = `
-            <h1>Reset Password</h1>
-            <p>Please use this code to reset your password</p>
-            <h2>${resetCode}</h2>
-            <h5>Note: This code will expire in 10 minutes</h5>
-            `;
-    } else if (purpose == "updateusername") {
-      emailMessage = `
-            <h1>Update Username</h1>
-            <p>Please use this code to update your username</p>
-            <h2>${resetCode}</h2>
-            <h5>Note: This code will expire in 10 minutes</h5>
+            <div>
+              <h1>Password Reset</h1>
+              <p>Please use this code to reset your rent-car-service account password</p>
+              <h2>${resetCode}</h2>
+              <h5>Note: This code will expire in 10 minutes</h5>
+            </div>
             `;
     }
 
