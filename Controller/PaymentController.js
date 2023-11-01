@@ -52,7 +52,7 @@ export const verifyPayment = async (req, res) => {
   // do your database stuff here
 
   return res.redirect(
-    `http://localhost:3000/paymentsuccess?reference_id=${razorpay_payment_id}`
+    `https://rent-car-service-iiitbhopal.netlify.app/paymentsuccess?reference_id=${razorpay_payment_id}`
   );
 };
 
