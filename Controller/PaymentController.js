@@ -1,6 +1,8 @@
 import Razorpay from "razorpay";
 import User from "../Database/Models/UserModel.js";
 import crypto from "crypto";
+import Payment from "../Database/Models/PaymentModel.js";
+import { CLIENT_URL } from "../config/config.js";
 
 // process.env.RAZORPAY_SECRET_TEXT
 const razorpayInstance = new Razorpay({
@@ -49,10 +51,22 @@ export const verifyPayment = async (req, res) => {
     return res.status(400).json({ message: "Invalid payment request" });
   }
 
-  // do your database stuff here
+  const paymentDetails = await razorpayInstance.payments.fetch(
+    razorpay_payment_id
+  );
+
+  const newPaymentRecord = new Payment({
+    email: paymentDetails.email,
+    amount: paymentDetails.amount / 100,
+    razorpay_payment_id: razorpay_payment_id,
+    razorpay_order_id: razorpay_order_id,
+    razorpay_signature: razorpay_signature,
+  });
+
+  await newPaymentRecord.save();
 
   return res.redirect(
-    `https://rent-car-service-iiitbhopal.netlify.app/paymentsuccess?reference_id=${razorpay_payment_id}`
+    `${CLIENT_URL}/paymentsuccess?reference_id=${razorpay_payment_id}`
   );
 };
 
