@@ -9,6 +9,7 @@ import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import Auth from "./Routes/Auth.js";
 import Payment from "./Routes/Payment.js";
+import Order from "./Routes/Order.js"
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -30,6 +31,7 @@ app.get("/logo.png", (req, res) => {
 });
 app.use("/auth", Auth);
 app.use("/payment", Payment);
+app.use("/order", Order)
 
 app.listen(port, () => {
   console.log(`listening at port ${port}`);
