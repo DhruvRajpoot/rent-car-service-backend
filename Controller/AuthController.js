@@ -123,10 +123,10 @@ export const sendresetcode = async (req, res) => {
     if (purpose == "forgotpassword") {
       emailMessage = `
             <div>
-              <h1>Password Reset</h1>
-              <p>Please use this code to reset your rent-car-service account password</p>
-              <h2>${resetCode}</h2>
-              <h5>Note: This code will expire in 10 minutes</h5>
+              <p>Hello ${existingUser.fullname},</p>
+              <p>Please use this code to reset your rent-car-service account password:</p>
+              <h1 style="background:#ddd;width:fit-content;padding:3px 12px;letter-spacing:1px">${resetCode}</h1>     
+              <h4>Note: This code will expire in 10 minutes</h4>
             </div>
             `;
     }
