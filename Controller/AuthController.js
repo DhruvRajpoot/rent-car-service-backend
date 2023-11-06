@@ -78,7 +78,6 @@ export const getAccessToken = async (req, res) => {
           const userobj = {
             _id: user._id.toString(),
             email: user.email,
-            fullname: user.fullname,
           };
           const accessToken = jwt.sign(userobj, process.env.JWT_SECRET, {
             expiresIn: "2hr",

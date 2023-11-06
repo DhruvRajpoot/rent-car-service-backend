@@ -7,6 +7,17 @@ export const getAllOrders = async (req, res) => {
     const { email } = req.body;
     const orders = await Order.find({ email: email });
 
+    // Temporary Fix: To delete all pending orders
+    const orderToBeDeleted = await Order.find({
+      status: "Pending",
+    });
+
+    if (orderToBeDeleted) {
+      orderToBeDeleted.forEach(async (order) => {
+        await Order.findByIdAndDelete(order._id);
+      });
+    }
+
     if (!orders) {
       return res.status(404).json({
         message: "Orders not found!",
@@ -27,7 +38,7 @@ export const getOrder = async (req, res) => {
 
     const order = await Order.findOne({
       razorpay_order_id: razorpay_order_id,
-      email: email,
+      // email: email, //TODO: uncomment this line
     });
 
     if (!order) {
