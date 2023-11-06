@@ -12,8 +12,8 @@ export const razorpayInstance = new Razorpay({
 
 // Create Order
 export const createOrder = async (req, res) => {
-  const { email, carDetails } = req.body;
-  const user = await User.findOne({ email: email });
+  const { carDetails } = req.body;
+  const user = await User.findOne({ email: req.user.email });
 
   const options = {
     amount: carDetails.price * 100,
@@ -24,7 +24,6 @@ export const createOrder = async (req, res) => {
 
   try {
     const order = await razorpayInstance.orders.create(options);
-    console.log(order);
     return res.status(200).json({
       message: "Order created successfully!",
       id: order.id,
@@ -52,10 +51,6 @@ export const verifyPayment = async (req, res) => {
     if (generatedSignature !== razorpay_signature) {
       return res.status(400).json({ message: "Invalid payment request" });
     }
-
-    const paymentDetails = await razorpayInstance.payments.fetch(
-      razorpay_payment_id
-    );
 
     // update order status
     const order = await Order.findOne({ razorpay_order_id: razorpay_order_id });

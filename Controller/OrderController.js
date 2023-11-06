@@ -4,8 +4,7 @@ import { razorpayInstance } from "./PaymentController.js";
 // get all orders placed by a user
 export const getAllOrders = async (req, res) => {
   try {
-    const { email } = req.body;
-    const orders = await Order.find({ email: email });
+    const orders = await Order.find({ email: req.user.email });
 
     // Temporary Fix: To delete all pending orders
     const orderToBeDeleted = await Order.find({
@@ -34,11 +33,10 @@ export const getAllOrders = async (req, res) => {
 export const getOrder = async (req, res) => {
   try {
     const { razorpay_order_id } = req.params;
-    const { email } = req.body;
 
     const order = await Order.findOne({
       razorpay_order_id: razorpay_order_id,
-      // email: email, //TODO: uncomment this line
+      email: req.user.email,
     });
 
     if (!order) {
@@ -56,14 +54,14 @@ export const getOrder = async (req, res) => {
 // create a new order
 export const createOrder = async (req, res) => {
   try {
-    const { email, razorpay_order_id, carId, journeyDetails } = req.body;
+    const { razorpay_order_id, carId, journeyDetails } = req.body;
 
     const razorpayOrder = await razorpayInstance.orders.fetch(
       razorpay_order_id
     );
 
     const newOrder = new Order({
-      email: email,
+      email: req.user.email,
       amount: razorpayOrder.amount / 100,
       razorpay_order_id: razorpay_order_id,
       carId: carId,
@@ -76,7 +74,7 @@ export const createOrder = async (req, res) => {
       message: "Order created successfully!",
       id: newOrder._id,
       carId: carId,
-      email: email,
+      email: req.user.email,
     });
   } catch (error) {
     return res.status(500).json(error);
@@ -87,11 +85,11 @@ export const createOrder = async (req, res) => {
 export const updateOrderStatus = async (req, res) => {
   try {
     const { razorpay_order_id } = req.params;
-    const { email, status } = req.body;
+    const { status } = req.body;
 
     const order = await Order.findOne({
       razorpay_order_id: razorpay_order_id,
-      email: email,
+      email: req.user.email,
     });
 
     if (!order) {

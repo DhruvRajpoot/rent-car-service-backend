@@ -5,7 +5,12 @@ import bcrypt from "bcrypt";
 
 // Add user (register user)
 export const signup = async (req, res) => {
-  const user = new User(req.body);
+  const { fullname, email, password } = req.body;
+  const user = new User({
+    fullname,
+    email,
+    password,
+  });
   const existingUser = await User.findOne({ email: req.body.email });
   try {
     if (!existingUser) {
@@ -22,7 +27,7 @@ export const signup = async (req, res) => {
         user: filterUser,
       });
     } else {
-      res.status(400).json({ error: "User already exists" });
+      res.status(401).json({ error: "User already exists" });
     }
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -38,11 +43,11 @@ export const login = async (req, res) => {
     }
     const user = await User.findOne({ email: email });
     if (!user) {
-      return res.status(404).json({ error: "Invalid Credentials" });
+      return res.status(401).json({ error: "Invalid Credentials" });
     }
     const isMatch = await user.comparePassword(req.body.password);
     if (!isMatch) {
-      return res.status(404).json({ error: "Invalid Credentials" });
+      return res.status(401).json({ error: "Invalid Credentials" });
     }
     const token = await user.generateAuthToken();
     const filterUser = {
