@@ -62,6 +62,7 @@ export const createOrder = async (req, res) => {
 
     const newOrder = new Order({
       email: req.user.email,
+      fullname: req.user.fullname,
       amount: razorpayOrder.amount / 100,
       razorpay_order_id: razorpay_order_id,
       carId: carId,
@@ -75,6 +76,7 @@ export const createOrder = async (req, res) => {
       id: newOrder._id,
       carId: carId,
       email: req.user.email,
+      fullname: req.user.fullname,
     });
   } catch (error) {
     return res.status(500).json(error);
@@ -113,6 +115,7 @@ export const updateOrderStatus = async (req, res) => {
       id: order._id,
       status: order.status,
       email: order.email,
+      fullname: order.fullname,
       razorpayOrderId: order.razorpay_order_id,
     });
   } catch (error) {

@@ -1,8 +1,10 @@
 import Razorpay from "razorpay";
+import nodemailer from "nodemailer";
 import User from "../Database/Models/UserModel.js";
 import crypto from "crypto";
 import { CLIENT_URL } from "../config/config.js";
 import Order from "../Database/Models/OrderModel.js";
+import carData from "../assets/CarData.js";
 
 // process.env.RAZORPAY_SECRET_TEXT
 export const razorpayInstance = new Razorpay({
@@ -60,6 +62,60 @@ export const verifyPayment = async (req, res) => {
 
     order.status = "Paid";
     await order.save();
+
+    // send email function
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true,
+      auth: {
+        user: process.env.EMAIL,
+        pass: process.env.EMAIL_PASSWORD,
+      },
+    });
+
+    const carDetails = carData.filter(
+      (car) => car.id === Number(order.carId)
+    )[0];
+
+    let emailMessage = `
+            <div>
+              <h2>Dear ${order.fullname},</h2>
+              <h3>Your order is successfully placed</h3>
+              <p>Order ID : ${razorpay_order_id}</p>
+              <p>Amount Paid : Rs. ${order.amount}</p>
+
+              <h3>Car Details:</h3>
+              <p>Name : ${carDetails.carName}</p>
+              <p>Model : ${carDetails.model}</p>
+
+              <h3>Journey Details:</h3>
+              <p>Rentee Name : ${
+                order.journeyDetails.firstname + order.journeyDetails.lastname
+              }</p>
+              <p>Rentee Email : ${order.journeyDetails.email}</p>
+              <p>Phone Number : ${order.journeyDetails.mobilenumber}</p>
+              <p>Pickup Location : ${order.journeyDetails.address}</p>
+              <p>Pickup Date : ${order.journeyDetails.pickup_date}</p>
+
+              <h4>We will deliver your car on time.</h4>
+              <h4>Thank you for choosing us.</h4>
+            </div>
+              `;
+
+    const mailOptions = {
+      from: process.env.EMAIL,
+      to: order.email,
+      subject: `Rent Car Service : Confirmation of your order #${razorpay_order_id}`,
+      html: emailMessage,
+    };
+    await transporter.sendMail(mailOptions, (error, response) => {
+      if (error) {
+        console.log("error", error);
+      } else {
+        console.log("Email Sent Successfully");
+      }
+    });
 
     return res.redirect(
       `${CLIENT_URL}/paymentsuccess?payment_id=${razorpay_payment_id}&order_id=${razorpay_order_id}`
